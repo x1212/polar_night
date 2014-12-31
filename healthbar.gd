@@ -18,5 +18,5 @@ func _process(delta):
 		var scale = Vector3(parent.health*1.0/parent.max_health,1,1)
 		set_scale(scale)
 	else:
-		#hide()
-		show()
+		hide()
+		#show()

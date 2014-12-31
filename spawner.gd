@@ -65,11 +65,11 @@ func set_mob_type( type ):
 
 
 func _on_Area_body_enter( body ):
-	if (  body.mob_type == mob_type   ):
+	if (  body.mob_type == mob_type  ):
 		body.support()
 	else:
 		body.unsupport()
-	pass # replace with function body
+
 
 
 func _on_Area_body_exit( body ):
@@ -77,4 +77,4 @@ func _on_Area_body_exit( body ):
 		body.unsupport()
 	else:
 		body.support()
-	pass # replace with function body
+
