@@ -41,7 +41,7 @@ var old_pos = Vector3(0,0,0)
 
 var tick = 1.0
 var tick_timer = tick
-var health_tick = 2
+var health_tick = 1
 func _fixed_process(delta):
 	tick_timer -= delta
 	
@@ -87,7 +87,7 @@ func _fixed_process(delta):
 		tick_timer = tick
 		health_tick -= 1
 		if (health_tick < 0):
-			health += 1 + support_val
+			health += 1 + support_val*2
 			health_tick = 2
 	
 	pass
