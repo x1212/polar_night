@@ -119,6 +119,24 @@ func find_objective():
 		get_parent().get_parent().get_node("potential_spawns").remove_child(objective_list[rand])
 		return
 	
+	if ( mob_class == DESTROYER and tick_timer < 0.0 and abs(get_parent().get_parent().get_node("human_units").get_child_count() - get_parent().get_parent().get_node("snowman_units").get_child_count()) > 5):
+		randomize()
+		if ( randi()%5 == 4 ):
+			if ( mob_type == SNOWMAN ):
+				if (get_parent().get_parent().get_node("human_units").get_child_count() - get_parent().get_parent().get_node("snowman_units").get_child_count() > 0):
+					mob_class = FIGHTER
+			else:
+				if (get_parent().get_parent().get_node("human_units").get_child_count() - get_parent().get_parent().get_node("snowman_units").get_child_count() < 0):
+					mob_class = FIGHTER
+	elif ( mob_class == FIGHTER and tick_timer < 0.0 and (abs(get_parent().get_parent().get_node("human_spawns").get_child_count() - get_parent().get_parent().get_node("snowman_spawns").get_child_count()) > 1 or enemy_unit_root_node.get_child_count() <= 1)):
+		randomize()
+		if ( randi()%5 == 4 ):
+			if ( mob_type == SNOWMAN ):
+				if (get_parent().get_parent().get_node("human_spawns").get_child_count() - get_parent().get_parent().get_node("snowman_spawns").get_child_count() > 0):
+					mob_class = DESTROYER
+			else:
+				if (get_parent().get_parent().get_node("human_spawns").get_child_count() - get_parent().get_parent().get_node("snowman_spawns").get_child_count() < 0):
+					mob_class = DESTROYER
 	
 	if ( objective_list.size() > 0 ):
 		objective = objective_list[0].get_translation()
@@ -138,9 +156,9 @@ func ai():
 	new_dir.y = 0.0
 	if ( new_dir.length() > 1.2 ):
 		dir = new_dir.normalized()
-		if (mob_class == VILLAGER ):
-			print(mob_type)
-			print (new_dir.length())
+		#if (mob_class == VILLAGER ):
+		#	print(mob_type)
+		#	print (new_dir.length())
 	elif ( mob_class == VILLAGER ):
 		# todo: spawn camp
 		var spawn = load("res://spawner.scn").instance()
@@ -190,6 +208,10 @@ func damage(level):
 		return 20
 	else:
 		return 1
+
+
+func get_level():
+	return sqrt(ep/10)+1
 
 
 

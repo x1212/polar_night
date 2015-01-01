@@ -8,6 +8,9 @@ extends Area
 var SNOWMAN = "snowman"
 var HUMAN = "human"
 
+var max_health = 20
+var health = max_health
+
 func _ready():
 	set_fixed_process(true)
 	pass
@@ -35,14 +38,18 @@ func spawn_mob():
 	base_mob.mob_type = mob_type
 	base_mob.add_child(mob_sprite)
 	var pos = get_translation()
-	pos.y = 1
+	pos.y = 0.85
 	base_mob.set_translation(pos)
 	
 	if ( mob_type == SNOWMAN ):
+		if ( get_parent().get_parent().get_node("snowman_units").get_child_count() > 15 ):
+			return
 		mob_sprite.set_texture(load("res://gfx/snowman.png"))
 		get_parent().get_parent().get_node("snowman_units").add_child(base_mob)
 		base_mob.active = true
 	elif ( mob_type == HUMAN ):
+		if ( get_parent().get_parent().get_node("human_units").get_child_count() > 15 ):
+			return
 		mob_sprite.set_texture(load("res://gfx/human.png"))
 		get_parent().get_parent().get_node("human_units").add_child(base_mob)
 		var fire = load("res://fire.scn").instance()
@@ -79,6 +86,15 @@ func _on_Area_body_enter( body ):
 		body.support()
 	else:
 		body.unsupport()
+		if (body.mob_class == "destroyer"):
+			body.queue_free()
+			health -= body.get_level()
+		if (health <= 0):
+			queue_free()
+			var spawn_spot = get_parent().get_parent().get_node("potential_spawns").duplicate()
+			spawn_spot.set_translation(get_translation())
+			get_parent().get_parent().get_node("potential_spawns").add_child(spawn_spot)
+			print ("spawn destroyed")
 
 
 
