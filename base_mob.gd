@@ -47,6 +47,10 @@ func _fixed_process(delta):
 	
 	if (health < 0):
 		queue_free()
+		if ( mob_class == VILLAGER ):
+			var spawn_spot = get_parent().get_parent().get_node("potential_spawns").duplicate()
+			spawn_spot.set_translation(objective)
+			get_parent().get_parent().get_node("potential_spawns").add_child(spawn_spot)
 	
 	if ( mob_type == SNOWMAN ):
 		enemy_spawn_root_node = get_parent().get_parent().get_node("human_spawns")
@@ -89,11 +93,69 @@ func _fixed_process(delta):
 	pass
 
 
-func ai():
-	if (mob_type == SNOWMAN ):
-		dir = Vector3(1,0,0)
+
+var objective = Vector3(0,0,0)
+func find_objective():
+	var objective_list = []
+	
+	if ( mob_class == FIGHTER ):
+		if (mob_type == SNOWMAN ):
+			objective_list = get_parent().get_parent().get_node("human_units").get_children()
+		else:
+			objective_list = get_parent().get_parent().get_node("snowman_units").get_children()
+	elif ( mob_class == DESTROYER ):
+		if (mob_type == SNOWMAN ):
+			objective_list = get_parent().get_parent().get_node("human_spawns").get_children()
+		else:
+			objective_list = get_parent().get_parent().get_node("snowman_spawns").get_children()
+	elif ( mob_class == VILLAGER ):
+		# todo: make potential camp list useable for both snowman and human villager units
+		objective_list = get_parent().get_parent().get_node("potential_spawns").get_children()
+		if (objective_list.size() <= 0):
+			mob_class = FIGHTER
+			return
+		var rand = randi()%objective_list.size()
+		objective = objective_list[rand].get_translation()
+		get_parent().get_parent().get_node("potential_spawns").remove_child(objective_list[rand])
+		return
+	
+	
+	if ( objective_list.size() > 0 ):
+		objective = objective_list[0].get_translation()
 	else:
-		dir = Vector3(-1,0,0)
+		objective = get_translation() + get_parent().get_translation()
+	
+
+
+var first_run = true
+func ai():
+	
+	if ( mob_class != VILLAGER  or  first_run ):
+		find_objective()
+		first_run = false
+	
+	var new_dir = objective  -  (get_translation() + get_parent().get_translation())
+	new_dir.y = 0.0
+	if ( new_dir.length() > 1.2 ):
+		dir = new_dir.normalized()
+		if (mob_class == VILLAGER ):
+			print(mob_type)
+			print (new_dir.length())
+	elif ( mob_class == VILLAGER ):
+		# todo: spawn camp
+		var spawn = load("res://spawner.scn").instance()
+		spawn.set_translation(objective)
+		var spawn_sprites 
+		if ( mob_type == SNOWMAN ):
+			get_parent().get_parent().get_node("snowman_spawns").add_child(spawn)
+			spawn_sprites = load("res://snowman_camp.scn").instance()
+		else:
+			get_parent().get_parent().get_node("human_spawns").add_child(spawn)
+			spawn_sprites = load("res://human_camp.scn").instance()
+		spawn_sprites.set_translation(Vector3(0,0.5,0))
+		spawn.add_child(spawn_sprites)
+		spawn.mob_type = mob_type
+		queue_free()
 	
 	if (attack_range.size()>0 and tick_timer < 0.0):
 		randomize()

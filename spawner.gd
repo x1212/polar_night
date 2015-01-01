@@ -53,6 +53,16 @@ func spawn_mob():
 		print("warning: unknown spawner type")
 	
 	
+	randomize()
+	var rand = randi()%100
+	if (rand > 60):
+		base_mob.mob_class = "fighter"
+	elif (rand > 5):
+		base_mob.mob_class = "destroyer"
+	else:
+		base_mob.mob_class = "villager"
+	
+	
 	
 	pass
 
